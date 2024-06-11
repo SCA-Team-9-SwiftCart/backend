@@ -61,15 +61,26 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/user', async (req, res) => {
+
+router.get("/user", async (req, res) => {
   const { userid } = req.query;
   if (!userid) {
     return res.status(401).json({
-      error: 'userId required',
+      error: "UserId required",
     });
   }
   const getUser = await user.getById(userid);
   res.status(200).json(getUser);
+});
+
+
+router.get("/users", async (req, res) => {
+  try {
+    const users = await user.getAll();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
