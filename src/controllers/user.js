@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const user = require("../utils/user");
-// const sendVerificationEmail = require("../utils/emailServices");
+const sendVerificationEmail = require("../utils/emailServices");
 
 router.get('/', (req, res) => {
   res.status(200).json({
