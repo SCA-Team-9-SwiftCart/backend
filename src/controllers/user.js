@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
-const user = require('../utils/user');
+const user = require("../utils/user");
+// const sendVerificationEmail = require("../utils/emailServices");
 
 router.get('/', (req, res) => {
   res.status(200).json({
@@ -10,12 +10,12 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post('/signup', async (req, res) => {
+router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({
-      error: 'one or more fields are not filled',
+      error: "One or more fields are not filled",
     });
   }
 
@@ -24,12 +24,30 @@ router.post('/signup', async (req, res) => {
     password,
   };
 
-  const newUser = await user.create(data);
-  if (newUser[1]) {
-    newUser[1].password = password; // Optionally mask the password before sending response
+  try {
+    const newUserResult = await user.create(data);
+
+    if (!newUserResult[0]) {
+      return res.status(400).json({
+        error: newUserResult[1], // Assuming newUser returns [false, error] in case of failure
+      });
+    }
+
+    const newUser = newUserResult[1];
+
+    // Send verification email
+    const token = newUser.verificationToken; // Assuming user schema has verificationToken field
+    await sendVerificationEmail(email, token);
+
+    // Optionally mask the password before sending response
+    newUser.password = password;
+
     res.status(201).json(newUser);
-  } else {
-    res.status(400).json(newUser);
+  } catch (error) {
+    console.error("Error signing up user:", error);
+    res.status(500).json({
+      error: "Internal server error",
+    });
   }
 });
 

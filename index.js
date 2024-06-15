@@ -20,8 +20,8 @@ mongoose.set('bufferCommands', false);
 
 // Connect to MongoDB
 mongoose.connect(DB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('Could not connect to MongoDB...', err));
+.then(() => console.log('Connected to MongoDB'))
+.catch(err => console.error('Could not connect to MongoDB...', err));
 
 // Use user routes
 app.use('/api', userRouter);

@@ -1,23 +1,29 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const crypto = require("crypto");
 
-// creates a new user
 const create = async ({ email, password }) => {
   try {
-    if (await User.findOne({ email: email })) {
-      return [false, "user already exists, kindly log in."];
+    if (await User.findOne({ email })) {
+      return [false, "User already exists, kindly log in."];
     }
+
     const hash = await bcrypt.hash(password, saltRounds);
-    const user = new User({
-      email: email,
+    const token = crypto.randomBytes(20).toString("hex"); // Generate random token
+
+    const newUser = new User({
+      email,
       password: hash,
+      verificationToken: token,
+      verificationTokenExpiry: Date.now() + 3600000, // 1 hour from now
     });
-    if (await user.save()) {
-      return [true, user];
+
+    if (await newUser.save()) {
+      return [true, newUser];
     }
-  } catch (err) {
-    return [false, err];
+  } catch (error) {
+    return [false, error.message];
   }
 };
 
@@ -51,7 +57,6 @@ const validate = async ({ email, password }) => {
   }
   return false;
 };
-
 
 // changes user password
 const updatePassword = async (password, userId) => {
