@@ -42,11 +42,6 @@ router.post("/signup", async (req, res) => {
     // Optionally mask the password before sending response
     // newUser.password = password; so this actually reveals the password
 
-    // data sent to the client
-    // const response = {
-
-    // }
-
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error signing up user:", error);
@@ -105,5 +100,14 @@ router.get("/users", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// resetting password 
+router.post("/:userId/password_reset", async (req, res) => {
+  const {userId} = req.params;
+  const {password, confirm_password: confirmPassword} = req.body;
+
+  // getting user details
+  // const userDetails = user.findUser({}); no find method available
+})
 
 module.exports = router;
