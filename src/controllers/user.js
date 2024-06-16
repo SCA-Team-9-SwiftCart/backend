@@ -36,11 +36,16 @@ router.post("/signup", async (req, res) => {
     const newUser = newUserResult[1];
 
     // Send verification email
-    const token = newUser.verificationToken; // Assuming user schema has verificationToken field
-    await sendVerificationEmail(email, token);
+    const {verificationToken: token, _id: userId} = newUser; // Assuming user schema has verificationToken field
+    await sendVerificationEmail(email, token, userId);
 
     // Optionally mask the password before sending response
-    newUser.password = password;
+    // newUser.password = password; so this actually reveals the password
+
+    // data sent to the client
+    // const response = {
+
+    // }
 
     res.status(201).json(newUser);
   } catch (error) {

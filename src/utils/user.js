@@ -12,7 +12,6 @@ const create = async ({ email, password }) => {
     const hash = await bcrypt.hash(password, saltRounds);
     // const token = crypto.randomBytes(20).toString("hex"); // Generate random token
     const token = generateOtp(4); // Generate 4 random token
-    console.log(token)
 
     const newUser = new User({
       email,
@@ -83,6 +82,7 @@ const updatePassword = async (password, userId) => {
   }
 };
 
+// Numbered digit OTP
 const generateOtp = function(length) {
   let otp = '';
   const number = function() {
