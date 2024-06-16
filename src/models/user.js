@@ -5,7 +5,6 @@ const UserSchema = new Schema(
   {
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    googleId: { type: String },
     thumbnail: {
       data: Buffer,
       contentType: String,
