@@ -10,7 +10,9 @@ const create = async ({ email, password }) => {
     }
 
     const hash = await bcrypt.hash(password, saltRounds);
-    const token = crypto.randomBytes(20).toString("hex"); // Generate random token
+    // const token = crypto.randomBytes(20).toString("hex"); // Generate random token
+    const token = generateOtp(4); // Generate 4 random token
+    console.log(token)
 
     const newUser = new User({
       email,
@@ -80,6 +82,19 @@ const updatePassword = async (password, userId) => {
     console.log(error);
   }
 };
+
+const generateOtp = function(length) {
+  let otp = '';
+  const number = function() {
+    return Math.floor(Math.random() * 10);
+  }
+
+  while (otp.length < length) {
+    otp += number();
+  }
+  
+  return Number(otp);
+}
 
 module.exports = {
   create,
