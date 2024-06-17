@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", user.otpVerification, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
 
   const data = {
     email,
-    password,
+    password, 
   };
 
   try {

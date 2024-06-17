@@ -28,6 +28,23 @@ const create = async ({ email, password }) => {
   }
 };
 
+// otp verification
+const otpVerification = async function(req, res, next) {
+
+  const {email, password, otp} = req.body;
+
+  const response = await getByEmail(email);
+  console.log(response);
+
+  if (response && response.verificationToken !== otp) return res.json({
+    error: true,
+    message: 'otp is invalid',
+  });
+  
+  next();
+  
+}
+
 /* Return user with specified id */
 const getById = async (id) => {
   const user = await User.findById(id);
@@ -98,6 +115,7 @@ const generateOtp = function(length) {
 
 module.exports = {
   create,
+  otpVerification,
   validate,
   getById,
   getByEmail,
