@@ -102,12 +102,27 @@ router.get("/users", async (req, res) => {
 });
 
 // resetting password 
-router.post("/:userId/password_reset", async (req, res) => {
-  const {userId} = req.params;
+router.post("/:email/password_reset", async (req, res) => {
+  const {email} = req.params;
   const {password, confirm_password: confirmPassword} = req.body;
 
-  // getting user details
-  // const userDetails = user.findUser({}); no find method available
+  const response = user.getByEmail(email);
+  if (!response) return res.status(401).json({
+    error: true,
+    message: 'Sign up you don\'t have an account yet!'
+  });
+  if (response && password !== confirmPassword) {
+    return res.status(401).json({
+      error: true,
+      message: 'Password is invalid, check and try again'
+    });
+  }
+
+  return res.status(201).json({
+    success: true,
+    message: 'Password reset successful'
+  })
+
 })
 
 module.exports = router;
