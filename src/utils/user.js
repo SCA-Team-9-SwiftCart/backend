@@ -34,12 +34,16 @@ const otpVerification = async function(req, res, next) {
   const {email, password, otp} = req.body;
 
   const response = await getByEmail(email);
-  console.log(response);
 
   if (response && response.verificationToken !== otp) return res.json({
     error: true,
     message: 'otp is invalid',
   });
+
+  if(response && response.verificationToken === otp) return res.json({
+    success: true,
+    message: 'verified, kindly login'
+  })
   
   next();
   
