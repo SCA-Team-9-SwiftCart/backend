@@ -10,7 +10,8 @@ const create = async ({ email, password }) => {
     }
 
     const hash = await bcrypt.hash(password, saltRounds);
-    const token = crypto.randomBytes(20).toString("hex"); // Generate random token
+    // const token = crypto.randomBytes(20).toString("hex"); // Generate random token
+    const token = generateOtp(4); // Generate 4 random token
 
     const newUser = new User({
       email,
@@ -26,6 +27,27 @@ const create = async ({ email, password }) => {
     return [false, error.message];
   }
 };
+
+// otp verification
+const otpVerification = async function(req, res, next) {
+
+  const {email, password, otp} = req.body;
+
+  const response = await getByEmail(email);
+
+  if (response && response.verificationToken !== otp) return res.json({
+    error: true,
+    message: 'otp is invalid',
+  });
+
+  if(response && response.verificationToken === otp) return res.json({
+    success: true,
+    message: 'verified, kindly login'
+  })
+  
+  next();
+  
+}
 
 /* Return user with specified id */
 const getById = async (id) => {
@@ -81,8 +103,23 @@ const updatePassword = async (password, userId) => {
   }
 };
 
+// Numbered digit OTP
+const generateOtp = function(length) {
+  let otp = '';
+  const number = function() {
+    return Math.floor(Math.random() * 10);
+  }
+
+  while (otp.length < length) {
+    otp += number();
+  }
+  
+  return Number(otp);
+}
+
 module.exports = {
   create,
+  otpVerification,
   validate,
   getById,
   getByEmail,

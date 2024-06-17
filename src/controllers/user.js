@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", user.otpVerification, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
 
   const data = {
     email,
-    password,
+    password, 
   };
 
   try {
@@ -36,11 +36,11 @@ router.post("/signup", async (req, res) => {
     const newUser = newUserResult[1];
 
     // Send verification email
-    const token = newUser.verificationToken; // Assuming user schema has verificationToken field
-    await sendVerificationEmail(email, token);
+    const {verificationToken: token, _id: userId} = newUser; // Assuming user schema has verificationToken field
+    await sendVerificationEmail(email, token, userId);
 
     // Optionally mask the password before sending response
-    newUser.password = password;
+    // newUser.password = password; so this actually reveals the password
 
     res.status(201).json(newUser);
   } catch (error) {
@@ -100,5 +100,29 @@ router.get("/users", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// resetting password 
+router.post("/:email/password_reset", async (req, res) => {
+  const {email} = req.params;
+  const {password, confirm_password: confirmPassword} = req.body;
+
+  const response = user.getByEmail(email);
+  if (!response) return res.status(401).json({
+    error: true,
+    message: 'Sign up you don\'t have an account yet!'
+  });
+  if (response && password !== confirmPassword) {
+    return res.status(401).json({
+      error: true,
+      message: 'Password is invalid, check and try again'
+    });
+  }
+
+  return res.status(201).json({
+    success: true,
+    message: 'Password reset successful'
+  })
+
+})
 
 module.exports = router;
